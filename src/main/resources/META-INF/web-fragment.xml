@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+semanticcms-core-controller - Serves SemanticCMS content from a Servlet environment.
+Copyright (C) 2016, 2017  AO Industries, Inc.
+	support@aoindustries.com
+	7262 Bull Pen Cir
+	Mobile, AL 36695
+
+This file is part of semanticcms-core-controller.
+
+semanticcms-core-controller is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+semanticcms-core-controller is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with semanticcms-core-controller.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd"
+  version="3.0"
+  metadata-complete="false">
+	<name>semanticcms-core-controller</name>
+	<!-- Causes: The display name was defined in multiple fragments with different value
+    <display-name>SemanticCMS Core Controller</display-name>
+	-->
+	<!-- TODO: Move to resources-filtered and use property? -->
+	<description>Serves SemanticCMS content from a Servlet environment.</description>
+	<!-- The UTF-8 filter must be first, declare before all other fragments -->
+	<ordering>
+		<before>
+			<others />
+		</before>
+	</ordering>
+	<!-- Filter to set request character encoding to UTF-8 -->
+	<filter>
+		<filter-name>Utf8RequestCharacterEncodingFilter</filter-name>
+		<filter-class>com.aoindustries.servlet.filter.Utf8RequestCharacterEncodingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Utf8RequestCharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+	<!-- Filter to strip invalid XML characters from incoming parameters -->
+	<filter>
+		<filter-name>StripInvalidXmlCharactersFilter</filter-name>
+		<filter-class>com.aoindustries.servlet.filter.StripInvalidXmlCharactersFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>StripInvalidXmlCharactersFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+	<!-- Tracks the request concurrency, used to decide to use concurrent or sequential implementations. -->
+	<filter>
+		<filter-name>CountConcurrencyFilter</filter-name>
+		<filter-class>com.semanticcms.core.controller.CountConcurrencyFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CountConcurrencyFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+	<!-- Sets up the cache for the request. -->
+	<filter>
+		<filter-name>CacheFilter</filter-name>
+		<filter-class>com.semanticcms.core.controller.CacheFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CacheFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+	<!-- Servlet to rewrite CSS files to include lastModified parameters -->
+	<servlet>
+		<servlet-name>LastModifiedServlet</servlet-name>
+		<servlet-class>com.aoindustries.servlet.http.LastModifiedServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LastModifiedServlet</servlet-name>
+		<url-pattern>*.css</url-pattern>
+	</servlet-mapping>
+</web-fragment>
